@@ -15,11 +15,24 @@ const count = (await getCollection("events")).length;
     </a>
 
     <span
-      class="ui-text ml-2 hidden items-center gap-2 rounded-full border border-[var(--line)] px-3 py-1 text-xs text-[var(--ink-soft)] sm:inline-flex"
+      class="ui-text ml-2 hidden items-center gap-2 rounded-full border border-[var(--line)] px-3 py-1 text-xs text-[var(--ink-soft)] lg:inline-flex"
     >
       <span class="h-1.5 w-1.5 rounded-full bg-[var(--cat-exploit)]"></span>
       {count} incidents logged
     </span>
+
+    <nav class="ml-2 flex items-center gap-3" aria-label="Site sections">
+      <a
+        href="/"
+        class="ui-text text-[11px] text-[var(--ink-soft)] transition-colors hover:text-[var(--accent-bright)]"
+        >Timeline</a
+      >
+      <a
+        href="/hall-of-shams/"
+        class="ui-text text-[11px] text-[var(--ink-soft)] transition-colors hover:text-[var(--accent-bright)]"
+        >Hall of Shams</a
+      >
+    </nav>
 
     <div class="ml-auto flex items-center gap-2">
       <a

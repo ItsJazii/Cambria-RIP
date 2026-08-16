@@ -1,0 +1,99 @@
+---
+import { getCollection, render } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import SourceChip from "../components/SourceChip.astro";
+import Embers from "../components/Embers.astro";
+import { SITE } from "../lib/site";
+import { RANKS } from "../content.config";
+
+const RANK_VAR: Record<string, string> = {
+  Legend: "var(--accent-bright)",
+  Notorious: "var(--cat-exploit)",
+  Suspect: "var(--cat-economy)",
+  Cleared: "var(--cat-token)",
+};
+
+const entries = (await getCollection("shams")).sort(
+  (a, b) => a.data.order - b.data.order || a.data.name.localeCompare(b.data.name),
+);
+
+const rendered = await Promise.all(
+  entries.map(async (entry) => ({ entry, Content: (await render(entry)).Content })),
+);
+
+const description =
+  "The Hall of Shams - the names, cohorts and accounts behind Cambria's incidents, ranked by how much of it was their own doing.";
+---
+
+<BaseLayout title={`Hall of Shams | ${SITE.name}`} description={description}>
+  <section class="relative overflow-hidden border-b border-[var(--line)]">
+    <Embers />
+    <div class="relative mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 sm:py-20">
+      <p class="ui-text text-xs text-[var(--muted)]">Nominations open</p>
+      <h1 class="display-text mt-4 text-5xl leading-none sm:text-6xl">
+        Hall of <span class="glow-text">Shams</span>
+      </h1>
+      <p class="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[var(--ink-soft)]">
+        {description}
+      </p>
+      <div class="mt-8 flex flex-wrap justify-center gap-2">
+        {
+          RANKS.map((rank) => (
+            <span
+              class="category-chip ui-text rounded px-2.5 py-1 text-[11px]"
+              style={`--cat: ${RANK_VAR[rank]}`}
+            >
+              {rank}
+            </span>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-4xl px-4 py-14 sm:px-6">
+    <ol class="space-y-5">
+      {
+        rendered.map(({ entry, Content }, i) => (
+          <li class="panel flex flex-col gap-4 p-5 sm:flex-row sm:items-start sm:gap-6">
+            <span class="display-text w-12 shrink-0 text-4xl leading-none text-[var(--muted)]">
+              {String(i + 1).padStart(2, "0")}
+            </span>
+            <div class="min-w-0 flex-1">
+              <div class="flex flex-wrap items-center gap-3">
+                <h2 class="display-text text-2xl leading-none">{entry.data.name}</h2>
+                <span
+                  class="category-chip ui-text rounded px-2 py-1 text-[10px] leading-none"
+                  style={`--cat: ${RANK_VAR[entry.data.rank]}`}
+                >
+                  {entry.data.rank}
+                </span>
+                {entry.data.dateLabel && (
+                  <span class="ui-text text-[11px] text-[var(--muted)]">{entry.data.dateLabel}</span>
+                )}
+              </div>
+              {entry.data.handle && (
+                <p class="ui-text mt-2 text-[11px] text-[var(--accent)]">{entry.data.handle}</p>
+              )}
+              <p class="mt-3 text-sm font-medium text-[var(--ink)]">{entry.data.charge}</p>
+              <div class="prose-cambria mt-3 text-sm">
+                <Content />
+              </div>
+              {entry.data.sources.length > 0 && (
+                <div class="mt-4 flex flex-wrap gap-2">
+                  {entry.data.sources.map((s) => (
+                    <SourceChip label={s.label} url={s.url} />
+                  ))}
+                </div>
+              )}
+            </div>
+          </li>
+        ))
+      }
+    </ol>
+
+    <p class="mt-10 text-center text-xs text-[var(--muted)]">
+      Entries live in <code>src/content/shams/</code> - one markdown file per name.
+    </p>
+  </section>
+</BaseLayout>

@@ -22,4 +22,26 @@ const events = defineCollection({
   }),
 });
 
-export const collections = { events };
+export const RANKS = ["Legend", "Notorious", "Suspect", "Cleared"] as const;
+
+const shams = defineCollection({
+  loader: glob({ base: "./src/content/shams", pattern: "**/*.md" }),
+  schema: z.object({
+    name: z.string(),
+    handle: z.string().optional(),
+    charge: z.string(),
+    rank: z.enum(RANKS).default("Suspect"),
+    dateLabel: z.string().optional(),
+    order: z.number().default(100),
+    sources: z
+      .array(
+        z.object({
+          label: z.string(),
+          url: z.string().url(),
+        }),
+      )
+      .default([]),
+  }),
+});
+
+export const collections = { events, shams };
