@@ -38,7 +38,7 @@ const jsonLd = {
   datePublished: event.data.date.toISOString(),
   description: event.data.summary,
   articleSection: event.data.category,
-  url: new URL(`/events/${event.id}/`, site).href,
+  url: new URL(`/events/${event.id}.html`, site).href,
   isBasedOn: event.data.sources.map((s) => s.url),
 };
 ---
@@ -86,7 +86,7 @@ const jsonLd = {
     <nav class="mt-10 grid gap-3 sm:grid-cols-2" aria-label="Adjacent incidents">
       {
         older && (
-          <a href={`/events/${older.id}/`} class="panel p-4 transition-colors hover:border-[var(--line-strong)]">
+          <a href={`/events/${older.id}.html`} class="panel p-4 transition-colors hover:border-[var(--line-strong)]">
             <span class="ui-text text-[11px] text-[var(--muted)]">&larr; Earlier</span>
             <span class="display-text mt-1 block text-lg leading-snug">{older.data.title}</span>
           </a>
@@ -95,7 +95,7 @@ const jsonLd = {
       {
         newer && (
           <a
-            href={`/events/${newer.id}/`}
+            href={`/events/${newer.id}.html`}
             class="panel p-4 text-right transition-colors hover:border-[var(--line-strong)] sm:col-start-2"
           >
             <span class="ui-text text-[11px] text-[var(--muted)]">Later &rarr;</span>

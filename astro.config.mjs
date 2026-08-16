@@ -3,8 +3,9 @@ import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  site: "https://cambria-timeline.pages.dev",
-  trailingSlash: "always",
+  site: "https://dist-yeplxfjl.devinapps.com",
+  trailingSlash: "never",
+  build: { format: "file" },
   integrations: [sitemap()],
   vite: {
     plugins: [tailwindcss()],

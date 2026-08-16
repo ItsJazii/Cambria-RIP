@@ -40,7 +40,7 @@ const { id, title, dateLabel, date, category, summary, sources } = Astro.props;
     </div>
 
     <h3 class="display-text mt-3 text-2xl leading-tight text-[var(--ink)] sm:text-3xl">
-      <a href={`/events/${id}/`} class="transition-colors hover:text-[var(--accent-bright)]"
+      <a href={`/events/${id}.html`} class="transition-colors hover:text-[var(--accent-bright)]"
         >{title}</a
       >
     </h3>
@@ -53,7 +53,7 @@ const { id, title, dateLabel, date, category, summary, sources } = Astro.props;
 
     <div class="entry-row mt-4 flex">
       <a
-        href={`/events/${id}/`}
+        href={`/events/${id}.html`}
         class="ui-text text-xs text-[var(--accent)] transition-colors hover:text-[var(--accent-bright)]"
         >Read the full story &rarr;</a
       >
