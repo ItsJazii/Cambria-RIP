@@ -1,7 +1,7 @@
 ---
 name: "luv"
 handle: "luvdiff"
-avatar: "/shame/luv.png"
+avatar: "/shame/luv.jpg"
 charge: "Noob Player"
 rank: "Suspect"
 order: 5

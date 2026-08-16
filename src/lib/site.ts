@@ -3,7 +3,7 @@ export const SITE = {
   title: "Everything That Went Right/Wrong in New Cambria",
   description:
     "A sourced timeline of Cambria incidents - exploits, dupes, rollbacks, outages, disabled mechanics, and the compensation posts that followed.",
-  ogImage: "/og-image.png",
+  ogImage: "/og-image.jpg",
   x: "https://x.com/playcambria",
   discord: "https://discord.gg/playcambria",
   blog: "https://blog.cambria.gg",
