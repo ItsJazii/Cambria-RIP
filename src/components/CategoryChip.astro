@@ -1,0 +1,17 @@
+---
+import { CATEGORY_VAR } from "../lib/site";
+
+interface Props {
+  category: string;
+  class?: string;
+}
+
+const { category, class: className = "" } = Astro.props;
+---
+
+<span
+  class:list={["category-chip ui-text rounded px-2 py-1 text-[11px] leading-none", className]}
+  style={`--cat: ${CATEGORY_VAR[category] ?? "var(--accent)"}`}
+>
+  {category}
+</span>

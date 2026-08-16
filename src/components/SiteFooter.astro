@@ -1,0 +1,41 @@
+---
+import { SITE } from "../lib/site";
+
+const links = [
+  { label: "X", href: SITE.x },
+  { label: "Discord", href: SITE.discord },
+  { label: "Blog", href: SITE.blog },
+  { label: "Docs", href: SITE.docs },
+];
+---
+
+<footer class="mt-24 border-t border-[var(--line)]">
+  <div
+    class="mx-auto flex max-w-6xl flex-col gap-6 px-4 py-10 sm:px-6 md:flex-row md:items-center md:justify-between"
+  >
+    <div>
+      <p class="display-text text-xl">Cambria<span class="glow-text">.rip</span></p>
+      <p class="mt-2 max-w-md text-sm text-[var(--muted)]">
+        An unofficial, community-maintained record of Cambria incidents. Every entry links to the
+        official patch note, blog post, or announcement it came from.
+      </p>
+    </div>
+    <nav class="flex flex-wrap gap-2" aria-label="Cambria links">
+      {
+        links.map((l) => (
+          <a
+            href={l.href}
+            target="_blank"
+            rel="noopener"
+            class="source-chip ui-text rounded-md px-3 py-1.5 text-xs"
+          >
+            {l.label}
+          </a>
+        ))
+      }
+    </nav>
+  </div>
+  <div class="border-t border-[var(--line)] px-4 py-5 text-center text-xs text-[var(--muted)]">
+    Not affiliated with Cambria. Sources are linked on every entry.
+  </div>
+</footer>

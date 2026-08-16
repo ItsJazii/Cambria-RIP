@@ -1,0 +1,26 @@
+{
+  "name": "cambria-timeline",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Everything that went wrong in New Cambria - a sourced timeline of Cambria incidents",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check"
+  },
+  "dependencies": {
+    "@astrojs/sitemap": "^3.6.0",
+    "@fontsource-variable/inter": "^5.2.8",
+    "@fontsource/jersey-15": "^5.2.8",
+    "@fontsource/pirata-one": "^5.2.8",
+    "@tailwindcss/vite": "^4.1.16",
+    "astro": "^5.18.2",
+    "tailwindcss": "^4.1.16"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.4",
+    "typescript": "^5.9.3"
+  }
+}

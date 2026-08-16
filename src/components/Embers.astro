@@ -1,0 +1,20 @@
+---
+const embers = Array.from({ length: 26 }, (_, i) => ({
+  left: (i * 37) % 100,
+  bottom: (i * 13) % 60,
+  delay: ((i * 7) % 14) + (i % 3) * 0.5,
+  duration: 11 + ((i * 5) % 9),
+  size: 2 + (i % 3),
+}));
+---
+
+<div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+  {
+    embers.map((e) => (
+      <span
+        class="ember"
+        style={`left:${e.left}%;bottom:${e.bottom}%;width:${e.size}px;height:${e.size}px;--ember-delay:${e.delay}s;--ember-duration:${e.duration}s`}
+      />
+    ))
+  }
+</div>

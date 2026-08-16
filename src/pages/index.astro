@@ -1,0 +1,201 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Embers from "../components/Embers.astro";
+import TimelineEntry from "../components/TimelineEntry.astro";
+import { SITE } from "../lib/site";
+import { CATEGORIES } from "../content.config";
+
+const events = (await getCollection("events")).sort(
+  (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+);
+
+const usedCategories = CATEGORIES.filter((c) => events.some((e) => e.data.category === c));
+
+const stats = [
+  { value: String(events.length), label: "Logged incidents" },
+  { value: "6.15M", label: "Keys over-emitted" },
+  { value: "$125k", label: "Grub Credit paid out" },
+  { value: "$85k", label: "Bug bounties paid" },
+];
+
+const site = Astro.site ?? new URL("https://cambria-timeline.pages.dev");
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "ItemList",
+  name: SITE.title,
+  description: SITE.description,
+  itemListOrder: "https://schema.org/ItemListOrderDescending",
+  numberOfItems: events.length,
+  itemListElement: events.map((e, i) => ({
+    "@type": "ListItem",
+    position: i + 1,
+    url: new URL(`/events/${e.id}/`, site).href,
+    name: e.data.title,
+  })),
+};
+---
+
+<BaseLayout title={`${SITE.title} | ${SITE.name}`} description={SITE.description}>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+  </Fragment>
+
+  <section class="relative overflow-hidden border-b border-[var(--line)]">
+    <div
+      class="pointer-events-none absolute inset-0 bg-cover bg-center opacity-45"
+      style="background-image:url('/hero-backdrop.png')"
+      aria-hidden="true"
+    >
+    </div>
+    <div
+      class="pointer-events-none absolute inset-0 bg-gradient-to-b from-[rgba(11,10,9,0.5)] via-[rgba(11,10,9,0.55)] to-[var(--canvas)]"
+      aria-hidden="true"
+    >
+    </div>
+    <Embers />
+    <div class="relative mx-auto max-w-4xl px-4 py-20 text-center sm:px-6 sm:py-28">
+      <p class="ui-text text-xs text-[var(--muted)]">An unofficial incident record</p>
+      <h1 class="display-text mt-5 text-5xl leading-[1.05] sm:text-7xl">
+        Everything That Went <span class="glow-text">Wrong</span><br />
+        in <span class="relative whitespace-nowrap">
+          <span class="text-[var(--muted)] line-through decoration-[var(--cat-exploit)]">Gielinor</span
+          >
+        </span>
+        New Cambria
+      </h1>
+      <p class="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-[var(--ink-soft)]">
+        Dupes, rollbacks, disabled mechanics, emergency downtime and the compensation posts that
+        followed. Every entry below links straight to Cambria's own patch notes, blog posts and
+        announcements.
+      </p>
+
+      <dl class="mx-auto mt-12 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
+        {
+          stats.map((s) => (
+            <div class="panel px-3 py-4">
+              <dt class="ui-text text-[10px] text-[var(--muted)]">{s.label}</dt>
+              <dd class="display-text mt-1 text-3xl text-[var(--accent-bright)]">{s.value}</dd>
+            </div>
+          ))
+        }
+      </dl>
+    </div>
+  </section>
+
+  <section class="mx-auto max-w-6xl px-4 sm:px-6">
+    <div
+      class="sticky top-16 z-30 -mx-4 flex flex-col gap-3 border-b border-[var(--line)] bg-[rgba(11,10,9,0.9)] px-4 py-4 backdrop-blur-md sm:-mx-6 sm:flex-row sm:items-center sm:justify-between sm:px-6"
+    >
+      <div class="flex flex-wrap items-center gap-2" role="group" aria-label="Filter by category">
+        <button
+          type="button"
+          class="filter-chip ui-text rounded-md px-3 py-1.5 text-[11px]"
+          data-filter="all"
+          aria-pressed="true">All</button
+        >
+        {
+          usedCategories.map((c) => (
+            <button
+              type="button"
+              class="filter-chip ui-text rounded-md px-3 py-1.5 text-[11px]"
+              data-filter={c}
+              aria-pressed="false"
+            >
+              {c}
+            </button>
+          ))
+        }
+      </div>
+
+      <div class="flex items-center gap-2">
+        <span class="ui-text text-[11px] text-[var(--muted)]" id="result-count"
+          >{events.length} entries</span
+        >
+        <label class="sr-only" for="sort">Sort order</label>
+        <select
+          id="sort"
+          class="ui-text rounded-md border border-[var(--line)] bg-[var(--surface)] px-2 py-1.5 text-[11px] text-[var(--ink-soft)]"
+        >
+          <option value="desc">Newest first</option>
+          <option value="asc">Oldest first</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="relative py-8" id="timeline">
+      <div
+        class="timeline-spine absolute bottom-0 top-0 w-px left-4 md:left-1/2"
+        aria-hidden="true"
+      >
+      </div>
+      <div id="timeline-list">
+        {
+          events.map((e) => (
+            <TimelineEntry
+              id={e.id}
+              title={e.data.title}
+              dateLabel={e.data.dateLabel}
+              date={e.data.date}
+              category={e.data.category}
+              summary={e.data.summary}
+              sources={e.data.sources}
+            />
+          ))
+        }
+      </div>
+      <p class="hidden py-16 text-center text-sm text-[var(--muted)]" id="empty-state">
+        No incidents in this category.
+      </p>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  const list = document.getElementById("timeline-list");
+  const countEl = document.getElementById("result-count");
+  const emptyEl = document.getElementById("empty-state");
+  const sortEl = document.getElementById("sort") as HTMLSelectElement | null;
+  const buttons = Array.from(
+    document.querySelectorAll<HTMLButtonElement>("button[data-filter]"),
+  );
+
+  if (list && sortEl && countEl && emptyEl) {
+    const entries = Array.from(list.querySelectorAll<HTMLElement>(".timeline-entry"));
+    let filter = "all";
+
+    const render = () => {
+      const dir = sortEl.value === "asc" ? 1 : -1;
+      const sorted = [...entries].sort(
+        (a, b) =>
+          dir *
+          (new Date(a.dataset.date ?? 0).valueOf() - new Date(b.dataset.date ?? 0).valueOf()),
+      );
+
+      let visible = 0;
+      for (const entry of sorted) {
+        list.appendChild(entry);
+        const show = filter === "all" || entry.dataset.category === filter;
+        entry.hidden = !show;
+        entry.classList.toggle("is-right", show && visible % 2 === 1);
+        if (show) visible++;
+      }
+
+      countEl.textContent = `${visible} ${visible === 1 ? "entry" : "entries"}`;
+      emptyEl.classList.toggle("hidden", visible > 0);
+    };
+
+    for (const button of buttons) {
+      button.addEventListener("click", () => {
+        filter = button.dataset.filter ?? "all";
+        for (const other of buttons) {
+          other.setAttribute("aria-pressed", String(other === button));
+        }
+        render();
+      });
+    }
+
+    sortEl.addEventListener("change", render);
+    render();
+  }
+</script>

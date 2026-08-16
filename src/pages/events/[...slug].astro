@@ -1,0 +1,108 @@
+---
+import { getCollection, render } from "astro:content";
+import type { CollectionEntry } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import CategoryChip from "../../components/CategoryChip.astro";
+import SourceChip from "../../components/SourceChip.astro";
+import { SITE } from "../../lib/site";
+
+export async function getStaticPaths() {
+  const events = (await getCollection("events")).sort(
+    (a, b) => b.data.date.valueOf() - a.data.date.valueOf(),
+  );
+
+  return events.map((event, i) => ({
+    params: { slug: event.id },
+    props: {
+      event,
+      newer: events[i - 1] ?? null,
+      older: events[i + 1] ?? null,
+    },
+  }));
+}
+
+interface Props {
+  event: CollectionEntry<"events">;
+  newer: CollectionEntry<"events"> | null;
+  older: CollectionEntry<"events"> | null;
+}
+
+const { event, newer, older } = Astro.props;
+const { Content } = await render(event);
+
+const site = Astro.site ?? new URL("https://cambria-timeline.pages.dev");
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "NewsArticle",
+  headline: event.data.title,
+  datePublished: event.data.date.toISOString(),
+  description: event.data.summary,
+  articleSection: event.data.category,
+  url: new URL(`/events/${event.id}/`, site).href,
+  isBasedOn: event.data.sources.map((s) => s.url),
+};
+---
+
+<BaseLayout
+  title={`${event.data.title} | ${SITE.name}`}
+  description={event.data.summary}
+  ogType="article"
+>
+  <Fragment slot="head">
+    <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} is:inline />
+  </Fragment>
+
+  <article class="mx-auto max-w-3xl px-4 py-14 sm:px-6">
+    <a
+      href="/"
+      class="ui-text text-xs text-[var(--muted)] transition-colors hover:text-[var(--accent)]"
+      >&larr; Back to the timeline</a
+    >
+
+    <div class="mt-6 flex flex-wrap items-center gap-3">
+      <time
+        class="ui-text text-xs text-[var(--muted)]"
+        datetime={event.data.date.toISOString().slice(0, 10)}>{event.data.dateLabel}</time
+      >
+      <CategoryChip category={event.data.category} />
+    </div>
+
+    <h1 class="display-text mt-4 text-4xl leading-tight sm:text-5xl">{event.data.title}</h1>
+    <p class="mt-5 border-l-2 border-[var(--accent-dark)] pl-4 text-lg text-[var(--ink-soft)]">
+      {event.data.summary}
+    </p>
+
+    <div class="prose-cambria mt-10">
+      <Content />
+    </div>
+
+    <section class="panel mt-12 p-5">
+      <h2 class="ui-text text-xs text-[var(--muted)]">Sources</h2>
+      <div class="mt-3 flex flex-wrap gap-2">
+        {event.data.sources.map((s) => <SourceChip label={s.label} url={s.url} />)}
+      </div>
+    </section>
+
+    <nav class="mt-10 grid gap-3 sm:grid-cols-2" aria-label="Adjacent incidents">
+      {
+        older && (
+          <a href={`/events/${older.id}/`} class="panel p-4 transition-colors hover:border-[var(--line-strong)]">
+            <span class="ui-text text-[11px] text-[var(--muted)]">&larr; Earlier</span>
+            <span class="display-text mt-1 block text-lg leading-snug">{older.data.title}</span>
+          </a>
+        )
+      }
+      {
+        newer && (
+          <a
+            href={`/events/${newer.id}/`}
+            class="panel p-4 text-right transition-colors hover:border-[var(--line-strong)] sm:col-start-2"
+          >
+            <span class="ui-text text-[11px] text-[var(--muted)]">Later &rarr;</span>
+            <span class="display-text mt-1 block text-lg leading-snug">{newer.data.title}</span>
+          </a>
+        )
+      }
+    </nav>
+  </article>
+</BaseLayout>

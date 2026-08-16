@@ -1,0 +1,17 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { SITE } from "../lib/site";
+---
+
+<BaseLayout title={`Lost in the dungeon | ${SITE.name}`} description="Page not found.">
+  <section class="mx-auto max-w-2xl px-4 py-32 text-center sm:px-6">
+    <p class="display-text glow-text text-7xl">404</p>
+    <h1 class="display-text mt-4 text-3xl">This one is not in the log</h1>
+    <p class="mt-4 text-sm text-[var(--ink-soft)]">
+      Nothing lives at this address. The full incident timeline is still standing.
+    </p>
+    <a href="/" class="glow-button mt-8 inline-block rounded-md px-5 py-2.5 text-sm"
+      >Back to the timeline</a
+    >
+  </section>
+</BaseLayout>
