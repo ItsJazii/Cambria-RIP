@@ -3,7 +3,7 @@ import sitemap from "@astrojs/sitemap";
 import tailwindcss from "@tailwindcss/vite";
 
 export default defineConfig({
-  site: "https://dist-yeplxfjl.devinapps.com",
+  site: "https://cambria-rip.vercel.app",
   trailingSlash: "never",
   build: { format: "file" },
   integrations: [sitemap()],
