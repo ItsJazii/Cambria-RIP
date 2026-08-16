@@ -25,11 +25,12 @@ const events = defineCollection({
 export const RANKS = ["Legend", "Notorious", "Suspect", "Cleared"] as const;
 
 const shame = defineCollection({
-  loader: glob({ base: "./src/content/shame", pattern: "**/*.md" }),
+  loader: glob({ base: "./src/content/shame", pattern: "**/[^_]*.md" }),
   schema: z.object({
     name: z.string(),
     handle: z.string().optional(),
-    charge: z.string(),
+    avatar: z.string().optional(),
+    charge: z.string().optional(),
     rank: z.enum(RANKS).default("Suspect"),
     dateLabel: z.string().optional(),
     order: z.number().default(100),
