@@ -1,6 +1,6 @@
 export const SITE = {
   name: "Cambria.rip",
-  title: "Everything That Went Wrong in New Cambria",
+  title: "Everything That Went Right/Wrong in New Cambria",
   description:
     "A sourced timeline of Cambria incidents - exploits, dupes, rollbacks, outages, disabled mechanics, and the compensation posts that followed.",
   ogImage: "/og-image.png",
