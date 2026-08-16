@@ -14,4 +14,6 @@ With 6.15 million phantom keys floating, "the core economic assumptions of the g
 
 Players who had opened T1 emeralds recently woke up with fewer keys, or fewer key-convertible items - bait, gems, sacks. Pending withdrawals funded by bugged keys were cancelled outright, because "cancelling them was the only way to recover that value before it left the system", then reprocessed against corrected balances.
 
+The reversal only touched keys earned from T1 emeralds; keys earned any other way were untouched, and a share of the remainder was locked as Key Vouchers redeemable 1:1 weekly from August 20th.
+
 To the team's credit, the post is unambiguous about fault: "this bug is entirely our fault, with players mostly unknowingly affected."

@@ -20,4 +20,6 @@ The first pass gave everyone 25% Grub Credit. The second pass sorted 1,920 accou
 
 184 players had withdrawn significantly more than their corrected balance and could not be fully reversed; those differences became "Mirelle's Adjustments" on their receipt, deducted from their airdrop at launch. Total Grub Credit issued: $125,000, funded from fees and uplift. A share of keys was temporarily locked as Key Vouchers, redeeming 1:1 on a weekly cycle from August 20th.
 
+All Genesis Points earned during the bug window were kept, with a bonus planned on top for regular players who did not mass farm the edge.
+
 Being told an algorithm has classified you as an exploiter, with your token allocation as the collateral, is a genuinely new category of MMO experience.
