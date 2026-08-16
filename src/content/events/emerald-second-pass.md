@@ -2,7 +2,7 @@
 title: "1,920 Players Sorted Into Three Buckets"
 date: 2026-08-14
 dateLabel: "Aug 14, 2026"
-category: "Economy"
+category: "Exploit Fix"
 summary: >-
   The second-pass resolution split affected accounts by how they played: 1,315 normal fishers got 100% of their bugged keys airdropped, 354 unclear cases got 50% Grub Credit, and 251 accounts judged to be farming the T1 edge got 25% and kept their adjustment.
 sources:

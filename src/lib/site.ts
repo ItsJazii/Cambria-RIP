@@ -12,6 +12,7 @@ export const SITE = {
 
 export const CATEGORY_VAR: Record<string, string> = {
   Exploit: "var(--cat-exploit)",
+  "Exploit Fix": "var(--cat-exploit-fix)",
   Economy: "var(--cat-economy)",
   Downtime: "var(--cat-downtime)",
   Patch: "var(--cat-patch)",

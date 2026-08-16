@@ -1,7 +1,14 @@
 import { defineCollection, z } from "astro:content";
 import { glob } from "astro/loaders";
 
-export const CATEGORIES = ["Exploit", "Economy", "Downtime", "Patch", "Token"] as const;
+export const CATEGORIES = [
+  "Exploit",
+  "Exploit Fix",
+  "Economy",
+  "Downtime",
+  "Patch",
+  "Token",
+] as const;
 
 const events = defineCollection({
   loader: glob({ base: "./src/content/events", pattern: "**/*.md" }),

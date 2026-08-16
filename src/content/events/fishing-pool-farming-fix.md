@@ -2,7 +2,7 @@
 title: "Back Up, With the Uplift Seat Closed"
 date: 2026-08-16
 dateLabel: "Aug 2026"
-category: "Patch"
+category: "Exploit Fix"
 summary: >-
   After another downtime window, Cambria returned with a fishing pool farming fix - holding an uplift seat now requires real ongoing wagering - and a steepened pond drip ladder so climbing it means something again.
 sources:

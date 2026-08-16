@@ -2,7 +2,7 @@
 title: "Cursed Pact and Chest Keys Sent to the Bench"
 date: 2026-06-13
 dateLabel: "Jun 13, 2026"
-category: "Patch"
+category: "Exploit Fix"
 summary: >-
   Patch v0.2.0 shipped the Demonic Power descent gamble and, in the fine print, disabled Cursed Pact and Chest Keys 'pending rework'.
 sources:

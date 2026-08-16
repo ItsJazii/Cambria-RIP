@@ -2,7 +2,7 @@
 title: "The Ballista Turret Is Also Quarantined"
 date: 2026-06-30
 dateLabel: "Jun 30, 2026"
-category: "Patch"
+category: "Exploit Fix"
 summary: >-
   Patch v0.2.3 pulled the Ballista Turret 'pending a deploy/UX rework (returns later)' - the third mechanic in two months to be switched off rather than fixed in place.
 sources:

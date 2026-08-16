@@ -2,7 +2,7 @@
 title: "Cambria Takes the Game Down and Re-Rolls Three Days From Seed"
 date: 2026-08-13
 dateLabel: "Aug 13, 2026"
-category: "Economy"
+category: "Exploit Fix"
 summary: >-
   To undo the emerald faucet, Cambria took everything down and re-ran every affected emerald open from seed to reconstruct the correct game state - then cancelled pending withdrawals that would have been funded by bugged keys.
 sources:

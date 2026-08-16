@@ -2,7 +2,7 @@
 title: "The Crown Is Disabled and the Botters Lose Their Points"
 date: 2026-08-15
 dateLabel: "Aug 2026"
-category: "Patch"
+category: "Exploit Fix"
 summary: >-
   The follow-up patch fixed T1 Emeralds, disabled the Crown mechanic, stopped Turnstile checks expiring while AFK, and slashed the points of any coordinated or botted T1 farming from the previous week. Fishing Sack RTP was also corrected from a silent near-100% back to the intended 65-98%.
 sources:
