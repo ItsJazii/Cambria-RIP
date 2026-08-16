@@ -13,7 +13,7 @@ const RANK_VAR: Record<string, string> = {
   Cleared: "var(--cat-token)",
 };
 
-const entries = (await getCollection("shams")).sort(
+const entries = (await getCollection("shame")).sort(
   (a, b) => a.data.order - b.data.order || a.data.name.localeCompare(b.data.name),
 );
 
@@ -22,16 +22,16 @@ const rendered = await Promise.all(
 );
 
 const description =
-  "The Hall of Shams - the names, cohorts and accounts behind Cambria's incidents, ranked by how much of it was their own doing.";
+  "The Hall of Shame - the names, cohorts and accounts behind Cambria's incidents, ranked by how much of it was their own doing.";
 ---
 
-<BaseLayout title={`Hall of Shams | ${SITE.name}`} description={description}>
+<BaseLayout title={`Hall of Shame | ${SITE.name}`} description={description}>
   <section class="relative overflow-hidden border-b border-[var(--line)]">
     <Embers />
     <div class="relative mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 sm:py-20">
       <p class="ui-text text-xs text-[var(--muted)]">Nominations open</p>
       <h1 class="display-text mt-4 text-5xl leading-none sm:text-6xl">
-        Hall of <span class="glow-text">Shams</span>
+        Hall of <span class="glow-text">Shame</span>
       </h1>
       <p class="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[var(--ink-soft)]">
         {description}
@@ -93,7 +93,7 @@ const description =
     </ol>
 
     <p class="mt-10 text-center text-xs text-[var(--muted)]">
-      Entries live in <code>src/content/shams/</code> - one markdown file per name.
+      Entries live in <code>src/content/shame/</code> - one markdown file per name.
     </p>
   </section>
 </BaseLayout>

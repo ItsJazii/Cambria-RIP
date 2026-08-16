@@ -1,7 +1,7 @@
 ---
 name: "Your Name Here"
 handle: "@add-a-file"
-charge: "Slot open - drop a markdown file in src/content/shams/"
+charge: "Slot open - drop a markdown file in src/content/shame/"
 rank: "Suspect"
 order: 99
 ---

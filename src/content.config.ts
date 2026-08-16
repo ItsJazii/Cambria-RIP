@@ -24,8 +24,8 @@ const events = defineCollection({
 
 export const RANKS = ["Legend", "Notorious", "Suspect", "Cleared"] as const;
 
-const shams = defineCollection({
-  loader: glob({ base: "./src/content/shams", pattern: "**/*.md" }),
+const shame = defineCollection({
+  loader: glob({ base: "./src/content/shame", pattern: "**/*.md" }),
   schema: z.object({
     name: z.string(),
     handle: z.string().optional(),
@@ -44,4 +44,4 @@ const shams = defineCollection({
   }),
 });
 
-export const collections = { events, shams };
+export const collections = { events, shame };
