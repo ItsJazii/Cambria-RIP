@@ -270,6 +270,33 @@ const unknowns = [
       <TrackingPanel />
     </div>
   </section>
+
+  <div
+    id="patience"
+    class="fixed inset-0 z-50 hidden items-center justify-center bg-[rgba(6,5,4,0.94)] px-4 py-8 backdrop-blur-sm"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="patience-title"
+  >
+    <div class="w-full max-w-2xl text-center">
+      <h2 id="patience-title" class="display-text text-3xl leading-none sm:text-5xl">
+        Wait, Have Some <span class="glow-text">Patience!</span>
+      </h2>
+      <p class="ui-text mt-3 text-[11px] text-[var(--muted)]" id="patience-status">
+        Reading your wallets from the chain...
+      </p>
+      <video
+        id="patience-video"
+        class="mt-5 w-full rounded-md border border-[var(--line)]"
+        preload="none"
+        playsinline
+        controls
+        data-src="/patience.mp4"></video>
+      <button type="button" id="patience-close" class="glow-button mt-5 rounded-md px-5 py-2.5 text-sm">
+        Show my estimate
+      </button>
+    </div>
+  </div>
 </BaseLayout>
 
 <script>
@@ -299,6 +326,36 @@ const unknowns = [
   const statusEl = el<HTMLElement>("status");
   const resultsEl = el<HTMLElement>("results");
   const rowsEl = el<HTMLTableSectionElement>("chain-rows");
+  const patienceEl = el<HTMLElement>("patience");
+  const patienceVideo = el<HTMLVideoElement>("patience-video");
+  const patienceStatus = el<HTMLElement>("patience-status");
+  const patienceClose = el<HTMLButtonElement>("patience-close");
+
+  const openPatience = () => {
+    if (!patienceEl) return;
+    patienceEl.classList.remove("hidden");
+    patienceEl.classList.add("flex");
+    document.body.style.overflow = "hidden";
+    if (patienceStatus) patienceStatus.textContent = "Reading your wallets from the chain...";
+    if (patienceVideo) {
+      if (!patienceVideo.src) patienceVideo.src = patienceVideo.dataset.src ?? "";
+      patienceVideo.currentTime = 0;
+      void patienceVideo.play().catch(() => {
+        patienceVideo.muted = true;
+        void patienceVideo.play().catch(() => {
+          /* autoplay blocked - controls are visible */
+        });
+      });
+    }
+  };
+
+  const closePatience = () => {
+    if (!patienceEl) return;
+    patienceEl.classList.add("hidden");
+    patienceEl.classList.remove("flex");
+    document.body.style.overflow = "";
+    patienceVideo?.pause();
+  };
 
   const assumptionIds = [
     "a-supply",
@@ -522,8 +579,10 @@ const unknowns = [
       return;
     }
 
+
     statusEl.textContent = "Reading onchain history...";
     save();
+    openPatience();
 
     const price = await prices();
     const collected: ChainStat[] = [];
@@ -537,6 +596,9 @@ const unknowns = [
 
     if (collected.length === 0) {
       statusEl.textContent = "Could not reach any public RPC - try again in a moment.";
+      if (patienceStatus) {
+        patienceStatus.textContent = "Could not reach any public RPC - close this and try again.";
+      }
       return;
     }
 
@@ -595,6 +657,7 @@ const unknowns = [
       evm.length + solana.length === 1 ? "" : "s"
     }.${missingSolana ? " Solana RPC was rate limited - retry for the Solana half." : ""}`;
     renderEstimate();
+    if (patienceStatus) patienceStatus.textContent = "Your estimate is ready below.";
   };
 
   restore();
@@ -621,4 +684,17 @@ const unknowns = [
   }
 
   walletsEl?.addEventListener("change", save);
+
+  patienceClose?.addEventListener("click", () => {
+    closePatience();
+    resultsEl?.scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+
+  patienceEl?.addEventListener("click", (event) => {
+    if (event.target === patienceEl) closePatience();
+  });
+
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape") closePatience();
+  });
 </script>
