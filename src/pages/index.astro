@@ -2,6 +2,7 @@
 import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Embers from "../components/Embers.astro";
+import TrackingPanel from "../components/TrackingPanel.astro";
 import TimelineEntry from "../components/TimelineEntry.astro";
 import { SITE } from "../lib/site";
 import { CATEGORIES } from "../content.config";
@@ -71,6 +72,16 @@ const jsonLd = {
         followed. Every entry below links straight to Cambria's own patch notes, blog posts and
         announcements.
       </p>
+
+      <div class="mt-7 flex flex-wrap items-center justify-center gap-3">
+        <a href="/airdrop-checker.html" class="glow-button rounded-md px-5 py-2.5 text-sm"
+          >Check your $RSGP airdrop</a
+        >
+        <a
+          href="/wall-of-shame.html"
+          class="source-chip ui-text rounded-md px-4 py-2.5 text-[11px]">Wall of Shame</a
+        >
+      </div>
 
       <dl class="mx-auto mt-12 grid max-w-3xl grid-cols-2 gap-3 sm:grid-cols-4">
         {
@@ -149,6 +160,10 @@ const jsonLd = {
       <p class="hidden py-16 text-center text-sm text-[var(--muted)]" id="empty-state">
         No incidents in this category.
       </p>
+    </div>
+
+    <div class="pb-4">
+      <TrackingPanel />
     </div>
   </section>
 </BaseLayout>

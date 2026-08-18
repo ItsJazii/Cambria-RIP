@@ -1,0 +1,63 @@
+---
+import { SITE } from "../lib/site";
+
+const sources = [
+  {
+    label: "docs.cambria.gg",
+    href: SITE.docs,
+    detail: "Whole docs site crawled page by page - patch notes, rewards, economics, points, NFTs.",
+  },
+  {
+    label: "blog.cambria.gg",
+    href: SITE.blog,
+    detail: "Post-mortems, season results, token and airdrop announcements.",
+  },
+  {
+    label: "@playcambria",
+    href: SITE.x,
+    detail: "Live outage notices, disabled mechanics, compensation posts.",
+  },
+];
+---
+
+<div class="panel px-6 py-7">
+  <div class="flex flex-wrap items-center gap-3">
+    <span class="relative flex h-2 w-2">
+      <span
+        class="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--cat-token)] opacity-75"
+      ></span>
+      <span class="relative inline-flex h-2 w-2 rounded-full bg-[var(--cat-token)]"></span>
+    </span>
+    <h2 class="display-text text-2xl leading-none">What we're tracking</h2>
+    <span class="ui-text rounded-md border border-[var(--line)] px-2 py-1 text-[10px] text-[var(--muted)]">
+      Checked every 6 hours
+    </span>
+  </div>
+
+  <p class="mt-3 text-sm leading-relaxed text-[var(--ink-soft)]">
+    This site re-reads Cambria's own sources on a schedule and logs anything new - new patches,
+    edited docs pages, incidents and remediation. Page edits are caught too, not just new posts.
+  </p>
+
+  <ul class="mt-5 grid gap-3 sm:grid-cols-3">
+    {
+      sources.map((s) => (
+        <li class="rounded-md border border-[var(--line)] bg-[rgba(255,243,221,0.02)] px-4 py-4">
+          <a
+            href={s.href}
+            target="_blank"
+            rel="noopener"
+            class="ui-text text-[11px] text-[var(--accent-bright)]"
+          >
+            {s.label}
+          </a>
+          <p class="mt-2 text-xs leading-relaxed text-[var(--muted)]">{s.detail}</p>
+        </li>
+      ))
+    }
+  </ul>
+
+  <p class="mt-5 text-xs leading-relaxed text-[var(--muted)]">
+    Not tracked automatically: the Wall of Shame, which is curated by hand.
+  </p>
+</div>
