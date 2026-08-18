@@ -8,6 +8,7 @@ export const SITE = {
   discord: "https://discord.gg/playcambria",
   blog: "https://blog.cambria.gg",
   docs: "https://docs.cambria.gg",
+  play: "https://lobby.cambria.gg/?code=Jazii",
 } as const;
 
 export const CATEGORY_VAR: Record<string, string> = {

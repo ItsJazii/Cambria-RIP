@@ -1,72 +1,28 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
 import Embers from "../components/Embers.astro";
-import SourceChip from "../components/SourceChip.astro";
 import TrackingPanel from "../components/TrackingPanel.astro";
 import { SITE } from "../lib/site";
 
 const description =
-  "Unofficial $RSGP airdrop estimator - paste your primary EVM and Solana wallets to score the onchain history Cambria's Loot Drop is built on.";
-
-const tracks = [
-  {
-    name: "Loot Drop (Care Packages)",
-    body: "Wallet based, not gameplay. Cambria scores a year of onchain history across Ethereum, Base, Blast, Abstract and Solana into a Degen Score (memecoin trading, Polymarket, perps, options, NFT flipping) and a Chad Score (time weighted holdings). The combined score decides how many Common, Epic and Legendary chests you get. Chests only reveal their $RSGP contents at TGE.",
-    sources: [
-      { label: "$RSGP is Coming!", url: "https://blog.cambria.gg/rsgp-is-coming/" },
-      { label: "Patch v0.3.0", url: "https://docs.cambria.gg/dungeons/patch-notes/patch-v0.3.0" },
-    ],
-  },
-  {
-    name: "Genesis Airdrop (Points)",
-    body: "Purely Points based. Weekly Favor and Trinkets were retired in patch v0.3.0 and replaced by Genesis Points, earned from Dungeon runs (Favor scales with Keys risked and results), Mirelle's fishing cash-ins, Bar Games, the Islands Supply Drive, a Gold Rush S4 spot and Genesis Quests. Invites pay 15% of your recruits' Points plus 5% of theirs.",
-    sources: [
-      { label: "Points doc", url: "https://docs.cambria.gg/dungeons/supplementary/points" },
-      { label: "Patch v0.3.0", url: "https://docs.cambria.gg/dungeons/patch-notes/patch-v0.3.0" },
-    ],
-  },
-  {
-    name: "Multipliers",
-    body: "Seals of Favor T1-T5 give 1.5x / 2x / 3x / 4x / 5x Favor (T4 and T5 also require Islet or Island ownership). NFT holdings (Founder, Islands, Charters) multiply Favor, legacy Signets keep a small multiplier, and the rolling 24h leaderboard adds up to 1.15x.",
-    sources: [{ label: "Rewards doc", url: "https://docs.cambria.gg/dungeons/rewards" }],
-  },
-  {
-    name: "Historical points",
-    body: "First Landing activity (22 Jan 2026 until the 12 May 2026 Dungeons release) was allocated 1% of total supply and that window is closed. Pre-Dungeons and post-Dungeons points are tracked separately, and Cambria says an official Airdrop checker for historical points is coming.",
-    sources: [{ label: "Points doc", url: "https://docs.cambria.gg/dungeons/supplementary/points" }],
-  },
-];
-
-const unknowns = [
-  "Total $RSGP supply",
-  "Share of supply going to the Loot Drop or Genesis Airdrop",
-  "Total Points issued across all players",
-  "$RSGP per chest tier",
-  "TGE date and listing price",
-];
+  "Check your estimated $RSGP airdrop - paste your primary EVM or Solana wallet and find out what you are getting.";
 ---
 
 <BaseLayout title={`$RSGP Airdrop Checker | ${SITE.name}`} description={description}>
   <section class="relative overflow-hidden border-b border-[var(--line)]">
     <Embers />
     <div class="relative mx-auto max-w-4xl px-4 py-16 text-center sm:px-6 sm:py-20">
-      <p class="ui-text text-xs text-[var(--muted)]">Unofficial estimate</p>
+      <p class="ui-text text-xs text-[var(--muted)]">Unofficial</p>
       <h1 class="display-text mt-4 text-5xl leading-none sm:text-6xl">
         $RSGP Airdrop <span class="glow-text">Checker</span>
       </h1>
       <p class="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[var(--ink-soft)]">
-        Paste your primary wallets. This reads their public onchain history and holdings straight
-        from public RPCs in your browser, then scores them the way Cambria describes its Degen and
-        Chad scoring - and turns that into an estimated $RSGP range.
-      </p>
-      <p class="mx-auto mt-4 max-w-2xl text-xs leading-relaxed text-[var(--muted)]">
-        Nothing is sent to a server and nothing here is official. Cambria has not published its
-        supply, allocations or scoring weights, so treat every number below as a rough model.
+        Paste your primary wallet - EVM or Solana - and check your airdrop.
       </p>
     </div>
   </section>
 
-  <section class="mx-auto max-w-5xl px-4 py-14 sm:px-6">
+  <section class="mx-auto max-w-3xl px-4 py-14 sm:px-6">
     <div class="panel px-6 py-7">
       <label class="ui-text text-[11px] text-[var(--muted)]" for="wallets">
         Your wallets - one per line (EVM 0x... and Solana)
@@ -81,187 +37,13 @@ const unknowns = [
 
       <div class="mt-4 flex flex-wrap items-center gap-3">
         <button type="button" id="check" class="glow-button rounded-md px-5 py-2.5 text-sm">
-          Check estimate
-        </button>
-        <button
-          type="button"
-          id="clear"
-          class="source-chip ui-text rounded-md px-4 py-2.5 text-[11px]"
-        >
-          Clear
+          Check your airdrop
         </button>
         <span class="ui-text text-[11px] text-[var(--muted)]" id="status"></span>
       </div>
 
-      <div class="mt-6 hidden" id="results">
-        <div class="grid gap-4 sm:grid-cols-3">
-          <div class="rounded-md border border-[var(--line)] px-4 py-4">
-            <p class="ui-text text-[10px] text-[var(--muted)]">Degen score</p>
-            <p class="display-text mt-1 text-4xl text-[var(--cat-exploit)]" id="degen">0</p>
-            <p class="mt-1 text-[11px] text-[var(--muted)]">Onchain activity across all chains</p>
-          </div>
-          <div class="rounded-md border border-[var(--line)] px-4 py-4">
-            <p class="ui-text text-[10px] text-[var(--muted)]">Chad score</p>
-            <p class="display-text mt-1 text-4xl text-[var(--cat-token)]" id="chad">0</p>
-            <p class="mt-1 text-[11px] text-[var(--muted)]">Value held in the wallets you pasted</p>
-          </div>
-          <div class="rounded-md border border-[var(--line)] px-4 py-4">
-            <p class="ui-text text-[10px] text-[var(--muted)]">Likely chest tier</p>
-            <p class="display-text mt-1 text-4xl text-[var(--accent-bright)]" id="tier">-</p>
-            <p class="mt-1 text-[11px] text-[var(--muted)]">Combined score <span id="total">0</span>/100</p>
-          </div>
-        </div>
-
-        <div class="mt-5 overflow-x-auto rounded-md border border-[var(--line)]">
-          <table class="w-full text-left text-sm">
-            <thead class="ui-text text-[10px] text-[var(--muted)]">
-              <tr>
-                <th class="px-4 py-3">Chain</th>
-                <th class="px-4 py-3">Transactions</th>
-                <th class="px-4 py-3">Native balance</th>
-                <th class="px-4 py-3">Value</th>
-              </tr>
-            </thead>
-            <tbody id="chain-rows" class="text-[var(--ink-soft)]"></tbody>
-          </table>
-        </div>
-
-        <div class="mt-6 rounded-md border border-[var(--line)] px-4 py-5">
-          <p class="ui-text text-[11px] text-[var(--muted)]">Estimated Loot Drop allocation</p>
-          <p class="display-text mt-2 text-4xl text-[var(--accent-bright)]" id="est-tokens">-</p>
-          <p class="mt-1 text-sm text-[var(--ink-soft)]" id="est-usd"></p>
-          <p class="mt-3 text-[11px] leading-relaxed text-[var(--muted)]">
-            Derived from the assumptions below. Cambria has published none of these figures, so the
-            true number can differ by an order of magnitude.
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div class="panel mt-6 px-6 py-7">
-      <h2 class="display-text text-2xl leading-none">Assumptions</h2>
-      <p class="mt-2 text-sm text-[var(--ink-soft)]">
-        Change these and both estimates update. Defaults use a 1B supply and the ~$30M FDV widely
-        reported from Cambria's $4.5M raise - not an official figure.
-      </p>
-      <div class="mt-5 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <label class="block">
-          <span class="ui-text text-[10px] text-[var(--muted)]">Total $RSGP supply</span>
-          <input
-            type="number"
-            id="a-supply"
-            value="1000000000"
-            min="1"
-            class="mt-2 w-full rounded-md border border-[var(--line)] bg-[var(--canvas)] px-3 py-2 text-sm outline-none focus:border-[var(--accent)]"
-          />
-        </label>
-        <label class="block">
-          <span class="ui-text text-[10px] text-[var(--muted)]">FDV in USD</span>
-          <input
-            type="number"
-            id="a-fdv"
-            value="30000000"
-            min="1"
-            class="mt-2 w-full rounded-md border border-[var(--line)] bg-[var(--canvas)] px-3 py-2 text-sm outline-none focus:border-[var(--accent)]"
-          />
-        </label>
-        <label class="block">
-          <span class="ui-text text-[10px] text-[var(--muted)]">% of supply to Loot Drop</span>
-          <input
-            type="number"
-            id="a-loot-pct"
-            value="5"
-            min="0"
-            step="0.1"
-            class="mt-2 w-full rounded-md border border-[var(--line)] bg-[var(--canvas)] px-3 py-2 text-sm outline-none focus:border-[var(--accent)]"
-          />
-        </label>
-        <label class="block">
-          <span class="ui-text text-[10px] text-[var(--muted)]">Eligible wallets</span>
-          <input
-            type="number"
-            id="a-wallets"
-            value="150000"
-            min="1"
-            class="mt-2 w-full rounded-md border border-[var(--line)] bg-[var(--canvas)] px-3 py-2 text-sm outline-none focus:border-[var(--accent)]"
-          />
-        </label>
-      </div>
-    </div>
-
-    <div class="panel mt-6 px-6 py-7">
-      <h2 class="display-text text-2xl leading-none">Genesis Points estimate</h2>
-      <p class="mt-2 text-sm text-[var(--ink-soft)]">
-        The gameplay track can't be read from a wallet - Points live in Cambria's database. Copy your
-        Points total from the Airdrop tab in the lobby and drop it here.
-      </p>
-      <div class="mt-5 grid gap-4 sm:grid-cols-3">
-        <label class="block">
-          <span class="ui-text text-[10px] text-[var(--muted)]">Your Genesis Points</span>
-          <input
-            type="number"
-            id="p-points"
-            value="0"
-            min="0"
-            class="mt-2 w-full rounded-md border border-[var(--line)] bg-[var(--canvas)] px-3 py-2 text-sm outline-none focus:border-[var(--accent)]"
-          />
-        </label>
-        <label class="block">
-          <span class="ui-text text-[10px] text-[var(--muted)]">% of supply to Genesis Airdrop</span>
-          <input
-            type="number"
-            id="p-pct"
-            value="4"
-            min="0"
-            step="0.1"
-            class="mt-2 w-full rounded-md border border-[var(--line)] bg-[var(--canvas)] px-3 py-2 text-sm outline-none focus:border-[var(--accent)]"
-          />
-        </label>
-        <label class="block">
-          <span class="ui-text text-[10px] text-[var(--muted)]">Total Points issued (all players)</span>
-          <input
-            type="number"
-            id="p-total"
-            value="5000000000"
-            min="1"
-            class="mt-2 w-full rounded-md border border-[var(--line)] bg-[var(--canvas)] px-3 py-2 text-sm outline-none focus:border-[var(--accent)]"
-          />
-        </label>
-      </div>
-      <p class="display-text mt-5 text-4xl text-[var(--accent-bright)]" id="points-tokens">-</p>
-      <p class="mt-1 text-sm text-[var(--ink-soft)]" id="points-usd"></p>
-    </div>
-
-    <div class="mt-10 grid gap-4 lg:grid-cols-2">
-      {
-        tracks.map((t) => (
-          <div class="panel px-6 py-6">
-            <h3 class="display-text text-xl leading-none">{t.name}</h3>
-            <p class="mt-3 text-sm leading-relaxed text-[var(--ink-soft)]">{t.body}</p>
-            <div class="mt-4 flex flex-wrap gap-2">
-              {t.sources.map((s) => (
-                <SourceChip label={s.label} url={s.url} />
-              ))}
-            </div>
-          </div>
-        ))
-      }
-    </div>
-
-    <div class="panel mt-6 px-6 py-6">
-      <h3 class="display-text text-xl leading-none">Still unpublished by Cambria</h3>
-      <ul class="mt-3 grid gap-2 text-sm text-[var(--ink-soft)] sm:grid-cols-2">
-        {
-          unknowns.map((u) => (
-            <li class="flex items-start gap-2">
-              <span class="mt-2 h-1.5 w-1.5 shrink-0 rotate-45 bg-[var(--cat-exploit)]" />
-              {u}
-            </li>
-          ))
-        }
-      </ul>
       <p class="mt-4 text-xs leading-relaxed text-[var(--muted)]">
-        When any of these land, this page gets updated - the official numbers always come from
+        Nothing is sent anywhere - this page never leaves your browser. The only real numbers live in
         Cambria's own Airdrop tab.
       </p>
     </div>
@@ -282,9 +64,6 @@ const unknowns = [
       <h2 id="patience-title" class="display-text text-3xl leading-none sm:text-5xl">
         Wait, Have Some <span class="glow-text">Patience!</span>
       </h2>
-      <p class="ui-text mt-3 text-[11px] text-[var(--muted)]" id="patience-status">
-        Reading your wallets from the chain...
-      </p>
       <video
         id="patience-video"
         class="mt-5 w-full rounded-md border border-[var(--line)]"
@@ -292,43 +71,30 @@ const unknowns = [
         playsinline
         controls
         data-src="/patience.mp4"></video>
-      <button type="button" id="patience-close" class="glow-button mt-5 rounded-md px-5 py-2.5 text-sm">
-        Show my estimate
-      </button>
+      <div class="mt-5 flex flex-wrap items-center justify-center gap-3">
+        <a
+          href={SITE.play}
+          target="_blank"
+          rel="noopener"
+          class="glow-button rounded-md px-5 py-2.5 text-sm">Play Cambria</a
+        >
+        <button
+          type="button"
+          id="patience-close"
+          class="source-chip ui-text rounded-md px-4 py-2.5 text-[11px]">Close</button
+        >
+      </div>
     </div>
   </div>
 </BaseLayout>
 
 <script>
-  type EvmChain = {
-    key: string;
-    label: string;
-    rpc: string;
-    weight: number;
-  };
-
-  const EVM_CHAINS: EvmChain[] = [
-    { key: "eth", label: "Ethereum", rpc: "https://ethereum-rpc.publicnode.com", weight: 1 },
-    { key: "base", label: "Base", rpc: "https://mainnet.base.org", weight: 1.2 },
-    { key: "blast", label: "Blast", rpc: "https://rpc.blast.io", weight: 1.6 },
-    { key: "abstract", label: "Abstract", rpc: "https://api.mainnet.abs.xyz", weight: 2 },
-  ];
-
-  const SOLANA_RPCS = [
-    "https://solana-rpc.publicnode.com",
-    "https://api.mainnet-beta.solana.com",
-  ];
-  const STORAGE_KEY = "cambria-rip-checker";
-
   const el = <T extends HTMLElement>(id: string) => document.getElementById(id) as T | null;
 
   const walletsEl = el<HTMLTextAreaElement>("wallets");
   const statusEl = el<HTMLElement>("status");
-  const resultsEl = el<HTMLElement>("results");
-  const rowsEl = el<HTMLTableSectionElement>("chain-rows");
   const patienceEl = el<HTMLElement>("patience");
   const patienceVideo = el<HTMLVideoElement>("patience-video");
-  const patienceStatus = el<HTMLElement>("patience-status");
   const patienceClose = el<HTMLButtonElement>("patience-close");
 
   const openPatience = () => {
@@ -336,7 +102,6 @@ const unknowns = [
     patienceEl.classList.remove("hidden");
     patienceEl.classList.add("flex");
     document.body.style.overflow = "hidden";
-    if (patienceStatus) patienceStatus.textContent = "Reading your wallets from the chain...";
     if (patienceVideo) {
       if (!patienceVideo.src) patienceVideo.src = patienceVideo.dataset.src ?? "";
       patienceVideo.currentTime = 0;
@@ -357,338 +122,28 @@ const unknowns = [
     patienceVideo?.pause();
   };
 
-  const assumptionIds = [
-    "a-supply",
-    "a-fdv",
-    "a-loot-pct",
-    "a-wallets",
-    "p-points",
-    "p-pct",
-    "p-total",
-  ];
-
-  const num = (id: string, fallback: number) => {
-    const input = el<HTMLInputElement>(id);
-    const value = input ? Number(input.value) : NaN;
-    return Number.isFinite(value) && value > 0 ? value : fallback;
-  };
-
-  const fmt = (n: number, digits = 0) =>
-    n.toLocaleString("en-US", { maximumFractionDigits: digits });
-
-  const usd = (n: number) =>
-    n.toLocaleString("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 2 });
-
-  const rpc = async (url: string, method: string, params: unknown[]) => {
-    const res = await fetch(url, {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ jsonrpc: "2.0", id: 1, method, params }),
-    });
-    if (!res.ok) throw new Error(`${method} failed`);
-    const json = (await res.json()) as { result?: unknown; error?: { message: string } };
-    if (json.error) throw new Error(json.error.message);
-    return json.result;
-  };
-
-  const solRpc = async (method: string, params: unknown[]) => {
-    let lastError: unknown;
-    for (const url of SOLANA_RPCS) {
-      try {
-        return await rpc(url, method, params);
-      } catch (error) {
-        lastError = error;
-      }
-    }
-    throw lastError instanceof Error ? lastError : new Error(`${method} failed`);
-  };
-
-  const prices = async () => {
-    try {
-      const res = await fetch(
-        "https://api.coingecko.com/api/v3/simple/price?ids=ethereum,solana&vs_currencies=usd",
-      );
-      const json = (await res.json()) as Record<string, { usd: number }>;
-      return {
-        eth: json.ethereum?.usd ?? 2000,
-        sol: json.solana?.usd ?? 80,
-      };
-    } catch {
-      return { eth: 2000, sol: 80 };
-    }
-  };
-
-  type ChainStat = {
-    label: string;
-    txs: number;
-    txLabel: string;
-    balance: number;
-    symbol: string;
-    value: number;
-    weight: number;
-  };
-
-  const evmStats = async (address: string, price: number) => {
-    const stats: ChainStat[] = [];
-    await Promise.all(
-      EVM_CHAINS.map(async (chain) => {
-        try {
-          const [nonce, balance] = await Promise.all([
-            rpc(chain.rpc, "eth_getTransactionCount", [address, "latest"]),
-            rpc(chain.rpc, "eth_getBalance", [address, "latest"]),
-          ]);
-          const txs = Number(BigInt(String(nonce)));
-          const eth = Number(BigInt(String(balance))) / 1e18;
-          stats.push({
-            label: chain.label,
-            txs,
-            txLabel: fmt(txs),
-            balance: eth,
-            symbol: "ETH",
-            value: eth * price,
-            weight: chain.weight,
-          });
-        } catch {
-          /* chain unreachable - skipped */
-        }
-      }),
-    );
-    return stats;
-  };
-
-  const solanaStats = async (address: string, price: number) => {
-    const stats: ChainStat[] = [];
-    try {
-      const [balance, signatures, tokens] = await Promise.all([
-        solRpc("getBalance", [address]),
-        solRpc("getSignaturesForAddress", [address, { limit: 1000 }]).catch(() => []),
-        solRpc("getTokenAccountsByOwner", [
-          address,
-          { programId: "TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA" },
-          { encoding: "jsonParsed" },
-        ]).catch(() => ({ value: [] })),
-      ]);
-      const lamports = (balance as { value?: number } | null)?.value ?? 0;
-      const sigs = Array.isArray(signatures) ? signatures.length : 0;
-      const tokenAccounts = (tokens as { value?: unknown[] } | null)?.value?.length ?? 0;
-      const sol = lamports / 1e9;
-      stats.push({
-        label: "Solana",
-        txs: sigs,
-        txLabel: sigs >= 1000 ? "1,000+" : fmt(sigs),
-        balance: sol,
-        symbol: "SOL",
-        value: sol * price,
-        weight: 1,
-      });
-      if (tokenAccounts > 0) {
-        stats.push({
-          label: "Solana tokens held",
-          txs: tokenAccounts * 8,
-          txLabel: `${fmt(tokenAccounts)} mints`,
-          balance: 0,
-          symbol: "",
-          value: 0,
-          weight: 1,
-        });
-      }
-    } catch {
-      /* solana unreachable - skipped */
-    }
-    return stats;
-  };
-
-  let lastScore = 0;
-
-  const renderEstimate = () => {
-    const supply = num("a-supply", 1_000_000_000);
-    const fdv = num("a-fdv", 30_000_000);
-    const lootPct = num("a-loot-pct", 5);
-    const wallets = num("a-wallets", 150_000);
-    const tokenPrice = fdv / supply;
-
-    const pool = supply * (lootPct / 100);
-    const share = lastScore / (30 * wallets);
-    const tokens = Math.max(0, pool * share);
-
-    const tokensEl = el<HTMLElement>("est-tokens");
-    const usdEl = el<HTMLElement>("est-usd");
-    if (tokensEl && usdEl) {
-      tokensEl.textContent = lastScore > 0 ? `${fmt(tokens)} $RSGP` : "-";
-      usdEl.textContent =
-        lastScore > 0
-          ? `About ${usd(tokens * tokenPrice)} at ${usd(tokenPrice)} per $RSGP - realistic range ${fmt(tokens * 0.5)} to ${fmt(tokens * 2)} $RSGP.`
-          : "";
-    }
-
-    const points = num("p-points", 0);
-    const pointsPct = num("p-pct", 4);
-    const pointsTotal = num("p-total", 5_000_000_000);
-    const pointsTokens = supply * (pointsPct / 100) * (points / pointsTotal);
-    const pTokensEl = el<HTMLElement>("points-tokens");
-    const pUsdEl = el<HTMLElement>("points-usd");
-    if (pTokensEl && pUsdEl) {
-      pTokensEl.textContent = points > 0 ? `${fmt(pointsTokens)} $RSGP` : "-";
-      pUsdEl.textContent =
-        points > 0
-          ? `About ${usd(pointsTokens * tokenPrice)} at ${usd(tokenPrice)} per $RSGP.`
-          : "Enter your Points to see an estimate.";
-    }
-  };
-
-  const save = () => {
-    const state: Record<string, string> = { wallets: walletsEl?.value ?? "" };
-    for (const id of assumptionIds) {
-      state[id] = el<HTMLInputElement>(id)?.value ?? "";
-    }
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    } catch {
-      /* storage unavailable */
-    }
-  };
-
-  const restore = () => {
-    try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (!raw) return;
-      const state = JSON.parse(raw) as Record<string, string>;
-      if (walletsEl && state.wallets) walletsEl.value = state.wallets;
-      for (const id of assumptionIds) {
-        const input = el<HTMLInputElement>(id);
-        if (input && state[id]) input.value = state[id];
-      }
-    } catch {
-      /* ignore malformed state */
-    }
-  };
-
-  const check = async () => {
-    if (!walletsEl || !statusEl || !resultsEl || !rowsEl) return;
+  el<HTMLButtonElement>("check")?.addEventListener("click", () => {
+    if (!walletsEl || !statusEl) return;
 
     const addresses = walletsEl.value
       .split(/[\s,]+/)
       .map((a) => a.trim())
       .filter(Boolean);
 
-    const evm = addresses.filter((a) => /^0x[a-fA-F0-9]{40}$/.test(a));
-    const solana = addresses.filter((a) => /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(a) && !a.startsWith("0x"));
+    const valid = addresses.filter(
+      (a) => /^0x[a-fA-F0-9]{40}$/.test(a) || /^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(a),
+    );
 
-    if (evm.length === 0 && solana.length === 0) {
+    if (valid.length === 0) {
       statusEl.textContent = "Paste at least one valid EVM or Solana address.";
       return;
     }
 
-
-    statusEl.textContent = "Reading onchain history...";
-    save();
+    statusEl.textContent = `Checking ${valid.length} wallet${valid.length === 1 ? "" : "s"}...`;
     openPatience();
-
-    const price = await prices();
-    const collected: ChainStat[] = [];
-
-    for (const address of evm) {
-      collected.push(...(await evmStats(address, price.eth)));
-    }
-    for (const address of solana) {
-      collected.push(...(await solanaStats(address, price.sol)));
-    }
-
-    if (collected.length === 0) {
-      statusEl.textContent = "Could not reach any public RPC - try again in a moment.";
-      if (patienceStatus) {
-        patienceStatus.textContent = "Could not reach any public RPC - close this and try again.";
-      }
-      return;
-    }
-
-    const merged = new Map<string, ChainStat>();
-    for (const stat of collected) {
-      const existing = merged.get(stat.label);
-      if (existing) {
-        existing.txs += stat.txs;
-        existing.txLabel = fmt(existing.txs);
-        existing.balance += stat.balance;
-        existing.value += stat.value;
-      } else {
-        merged.set(stat.label, { ...stat });
-      }
-    }
-
-    const stats = [...merged.values()];
-    const weightedTx = stats.reduce((sum, s) => sum + s.txs * s.weight, 0);
-    const heldUsd = stats.reduce((sum, s) => sum + s.value, 0);
-
-    const degen = Math.min(100, Math.round(22 * Math.log10(1 + weightedTx)));
-    const chad = Math.min(100, Math.round(20 * Math.log10(1 + heldUsd)));
-    const total = Math.round(degen * 0.6 + chad * 0.4);
-    lastScore = total;
-
-    const tier =
-      total >= 70 ? "Legendary" : total >= 45 ? "Epic" : total >= 18 ? "Common" : "Unlikely";
-
-    el<HTMLElement>("degen")!.textContent = String(degen);
-    el<HTMLElement>("chad")!.textContent = String(chad);
-    el<HTMLElement>("tier")!.textContent = tier;
-    el<HTMLElement>("total")!.textContent = String(total);
-
-    rowsEl.innerHTML = "";
-    for (const stat of stats) {
-      const row = document.createElement("tr");
-      row.className = "border-t border-[var(--line)]";
-      const cells = [
-        stat.label,
-        stat.txLabel,
-        stat.symbol ? `${fmt(stat.balance, 4)} ${stat.symbol}` : "-",
-        stat.value > 0 ? usd(stat.value) : "-",
-      ];
-      for (const value of cells) {
-        const cell = document.createElement("td");
-        cell.className = "px-4 py-3";
-        cell.textContent = value;
-        row.appendChild(cell);
-      }
-      rowsEl.appendChild(row);
-    }
-
-    resultsEl.classList.remove("hidden");
-    const missingSolana = solana.length > 0 && !stats.some((s) => s.label === "Solana");
-    statusEl.textContent = `Scored ${evm.length + solana.length} wallet${
-      evm.length + solana.length === 1 ? "" : "s"
-    }.${missingSolana ? " Solana RPC was rate limited - retry for the Solana half." : ""}`;
-    renderEstimate();
-    if (patienceStatus) patienceStatus.textContent = "Your estimate is ready below.";
-  };
-
-  restore();
-  renderEstimate();
-
-  el<HTMLButtonElement>("check")?.addEventListener("click", () => {
-    void check();
   });
 
-  el<HTMLButtonElement>("clear")?.addEventListener("click", () => {
-    if (walletsEl) walletsEl.value = "";
-    if (statusEl) statusEl.textContent = "";
-    resultsEl?.classList.add("hidden");
-    lastScore = 0;
-    save();
-    renderEstimate();
-  });
-
-  for (const id of assumptionIds) {
-    el<HTMLInputElement>(id)?.addEventListener("input", () => {
-      save();
-      renderEstimate();
-    });
-  }
-
-  walletsEl?.addEventListener("change", save);
-
-  patienceClose?.addEventListener("click", () => {
-    closePatience();
-    resultsEl?.scrollIntoView({ behavior: "smooth", block: "center" });
-  });
+  patienceClose?.addEventListener("click", closePatience);
 
   patienceEl?.addEventListener("click", (event) => {
     if (event.target === patienceEl) closePatience();
