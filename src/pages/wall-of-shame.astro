@@ -110,6 +110,15 @@ const initials = (name: string) =>
                   ))}
                 </div>
               )}
+
+              <div class="mt-auto flex w-full gap-2 pt-5" data-vote={entry.id}>
+                <button type="button" data-choice="keep" class="vote-btn source-chip ui-text flex-1 rounded-md px-3 py-2 text-[11px]">
+                  Keep <span data-count>0</span>
+                </button>
+                <button type="button" data-choice="remove" class="vote-btn source-chip ui-text flex-1 rounded-md px-3 py-2 text-[11px]">
+                  Remove <span data-count>0</span>
+                </button>
+              </div>
             </li>
           ))}
         </ul>
@@ -163,6 +172,14 @@ const initials = (name: string) =>
     padding: 0.55rem 0.75rem;
     font-size: 0.875rem;
   }
+  .vote-btn[aria-pressed="true"][data-choice="keep"] {
+    border-color: var(--cat-exploit);
+    color: var(--cat-exploit);
+  }
+  .vote-btn[aria-pressed="true"][data-choice="remove"] {
+    border-color: var(--cat-token);
+    color: var(--cat-token);
+  }
   .report-input:focus {
     outline: none;
     border-color: var(--accent);
@@ -190,6 +207,44 @@ const initials = (name: string) =>
   dialog.addEventListener("click", (e) => {
     if (e.target === dialog) dialog.close();
   });
+
+  type VoteState = { counts: Record<string, { keep: number; remove: number }>; mine: Record<string, string> };
+  const voteGroups = [...document.querySelectorAll<HTMLElement>("[data-vote]")];
+
+  const paintVotes = ({ counts, mine }: VoteState) => {
+    for (const group of voteGroups) {
+      const slug = group.dataset.vote!;
+      group.querySelectorAll<HTMLButtonElement>("[data-choice]").forEach((btn) => {
+        const choice = btn.dataset.choice as "keep" | "remove";
+        btn.querySelector("[data-count]")!.textContent = String(counts[slug]?.[choice] ?? 0);
+        btn.setAttribute("aria-pressed", String(mine[slug] === choice));
+      });
+    }
+  };
+
+  fetch("/api/votes")
+    .then((r) => (r.ok ? r.json() : null))
+    .then((state) => state && paintVotes(state))
+    .catch(() => {});
+
+  for (const group of voteGroups) {
+    group.addEventListener("click", async (e) => {
+      const btn = (e.target as HTMLElement).closest<HTMLButtonElement>("[data-choice]");
+      if (!btn) return;
+      const vote = btn.getAttribute("aria-pressed") === "true" ? null : btn.dataset.choice;
+      group.querySelectorAll("button").forEach((b) => (b.disabled = true));
+      try {
+        const res = await fetch("/api/vote", {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify({ slug: group.dataset.vote, vote }),
+        });
+        if (res.ok) paintVotes(await res.json());
+      } finally {
+        group.querySelectorAll("button").forEach((b) => (b.disabled = false));
+      }
+    });
+  }
 
   form.addEventListener("submit", async (e) => {
     e.preventDefault();

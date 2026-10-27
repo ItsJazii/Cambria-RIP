@@ -24,6 +24,52 @@ async function isAdmin(req: Request, env: Env) {
   return a === b;
 }
 
+// Requests arrive via the Vercel rewrite, so the visitor IP is the first x-forwarded-for hop.
+const clientIp = (req: Request) =>
+  req.headers.get("x-forwarded-for")?.split(",")[0].trim() || req.headers.get("cf-connecting-ip") || "unknown";
+
+const clientHash = (req: Request) => sha256(`cambria:${clientIp(req)}`);
+
+const SLUG = /^[a-z0-9-]{1,60}$/;
+
+async function listVotes(req: Request, env: Env) {
+  const ipHash = await clientHash(req);
+  const [totals, mine] = await Promise.all([
+    env.DB.prepare("SELECT slug, vote, COUNT(*) AS n FROM votes GROUP BY slug, vote").all<{ slug: string; vote: string; n: number }>(),
+    env.DB.prepare("SELECT slug, vote FROM votes WHERE ip_hash = ?").bind(ipHash).all<{ slug: string; vote: string }>(),
+  ]);
+  const counts: Record<string, { keep: number; remove: number }> = {};
+  for (const row of totals.results) {
+    counts[row.slug] ??= { keep: 0, remove: 0 };
+    counts[row.slug][row.vote as "keep" | "remove"] = row.n;
+  }
+  return json({ counts, mine: Object.fromEntries(mine.results.map((r) => [r.slug, r.vote])) });
+}
+
+async function castVote(req: Request, env: Env) {
+  let body: Record<string, unknown>;
+  try {
+    body = await req.json();
+  } catch {
+    return json({ error: "Invalid JSON" }, 400);
+  }
+  const slug = String(body.slug ?? "");
+  const vote = body.vote === null ? null : String(body.vote ?? "");
+  if (!SLUG.test(slug)) return json({ error: "Invalid profile" }, 400);
+  if (vote !== null && vote !== "keep" && vote !== "remove") return json({ error: "Invalid vote" }, 400);
+  const ipHash = await clientHash(req);
+  if (vote === null) {
+    await env.DB.prepare("DELETE FROM votes WHERE slug = ? AND ip_hash = ?").bind(slug, ipHash).run();
+  } else {
+    await env.DB.prepare(
+      "INSERT INTO votes (slug, ip_hash, vote) VALUES (?, ?, ?) ON CONFLICT (slug, ip_hash) DO UPDATE SET vote = excluded.vote, created_at = datetime('now')",
+    )
+      .bind(slug, ipHash, vote)
+      .run();
+  }
+  return listVotes(req, env);
+}
+
 async function createReport(req: Request, env: Env) {
   let body: Record<string, unknown>;
   try {
@@ -44,7 +90,7 @@ async function createReport(req: Request, env: Env) {
   }
   if (!/^[a-z0-9._]{2,32}$/i.test(discord)) return json({ error: "Enter a valid Discord username" }, 400);
 
-  const ip = req.headers.get("cf-connecting-ip") ?? req.headers.get("x-forwarded-for") ?? "unknown";
+  const ip = clientIp(req);
   const ipHash = await sha256(`cambria-reports:${ip}`);
   const recent = await env.DB.prepare(
     "SELECT COUNT(*) AS n FROM reports WHERE ip_hash = ? AND created_at > datetime('now', '-1 hour')",
