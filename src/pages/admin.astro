@@ -1,0 +1,119 @@
+---
+import "../styles/global.css";
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>Reports | Admin</title>
+  </head>
+  <body class="min-h-screen bg-[var(--canvas)] text-[var(--ink)]">
+    <main class="mx-auto max-w-5xl px-4 py-12 sm:px-6">
+      <div class="flex flex-wrap items-center gap-3">
+        <h1 class="display-text text-4xl leading-none">Wall of Shame reports</h1>
+        <span id="count" class="ui-text text-[11px] text-[var(--muted)]"></span>
+        <button id="logout" type="button" class="source-chip ui-text ml-auto hidden rounded-md px-3 py-2 text-[11px]">
+          Log out
+        </button>
+      </div>
+
+      <form id="login" class="panel mt-8 flex max-w-sm flex-col gap-3 p-6">
+        <label class="ui-text text-[11px] text-[var(--ink-soft)]" for="pw">Admin password</label>
+        <input
+          id="pw"
+          type="password"
+          autocomplete="current-password"
+          class="rounded-md border border-[var(--line-strong)] bg-[var(--surface-2)] px-3 py-2 text-sm text-[var(--ink)] focus:border-[var(--accent)] focus:outline-none"
+        />
+        <button type="submit" class="glow-button rounded-md px-4 py-2 text-sm">Open</button>
+        <p id="login-error" class="min-h-[1rem] text-xs text-[var(--cat-exploit)]"></p>
+      </form>
+
+      <ul id="list" class="mt-8 grid gap-4"></ul>
+    </main>
+
+    <script>
+      const KEY = "cambria-admin-pw";
+      const login = document.getElementById("login") as HTMLFormElement;
+      const pwInput = document.getElementById("pw") as HTMLInputElement;
+      const loginError = document.getElementById("login-error") as HTMLParagraphElement;
+      const list = document.getElementById("list") as HTMLUListElement;
+      const count = document.getElementById("count") as HTMLSpanElement;
+      const logout = document.getElementById("logout") as HTMLButtonElement;
+
+      type Report = { id: number; name: string; offense: string; discord: string; created_at: string };
+
+      const api = (path: string, init: RequestInit = {}) =>
+        fetch(path, {
+          ...init,
+          headers: { authorization: `Bearer ${sessionStorage.getItem(KEY) ?? ""}` },
+        });
+
+      const el = (tag: string, cls: string, text = "") => {
+        const node = document.createElement(tag);
+        node.className = cls;
+        node.textContent = text;
+        return node;
+      };
+
+      function render(reports: Report[]) {
+        count.textContent = `${reports.length} report${reports.length === 1 ? "" : "s"}`;
+        list.replaceChildren();
+        if (reports.length === 0) {
+          list.append(el("li", "panel px-6 py-10 text-center text-sm text-[var(--muted)]", "No reports yet."));
+          return;
+        }
+        for (const r of reports) {
+          const li = el("li", "panel flex flex-col gap-2 p-5");
+          const head = el("div", "flex flex-wrap items-baseline gap-3");
+          head.append(
+            el("h2", "display-text text-2xl leading-none", r.name),
+            el("span", "ui-text text-[11px] text-[var(--accent)]", `@${r.discord}`),
+            el("span", "ui-text ml-auto text-[11px] text-[var(--muted)]", new Date(r.created_at.replace(" ", "T") + "Z").toLocaleString()),
+          );
+          const del = el("button", "source-chip ui-text self-start rounded-md px-3 py-1.5 text-[11px]", "Delete");
+          del.addEventListener("click", async () => {
+            if (!confirm(`Delete report about ${r.name}?`)) return;
+            const res = await api(`/api/reports/${r.id}`, { method: "DELETE" });
+            if (res.ok) load();
+          });
+          li.append(head, el("p", "whitespace-pre-wrap text-sm leading-relaxed text-[var(--ink-soft)]", r.offense), del);
+          list.append(li);
+        }
+      }
+
+      async function load() {
+        const res = await api("/api/reports");
+        if (res.status === 401) {
+          sessionStorage.removeItem(KEY);
+          login.classList.remove("hidden");
+          logout.classList.add("hidden");
+          list.replaceChildren();
+          count.textContent = "";
+          loginError.textContent = pwInput.value ? "Wrong password." : "";
+          return;
+        }
+        const data = await res.json();
+        login.classList.add("hidden");
+        logout.classList.remove("hidden");
+        render(data.reports ?? []);
+      }
+
+      login.addEventListener("submit", (e) => {
+        e.preventDefault();
+        sessionStorage.setItem(KEY, pwInput.value);
+        load();
+      });
+      logout.addEventListener("click", () => {
+        sessionStorage.removeItem(KEY);
+        pwInput.value = "";
+        load();
+      });
+      if (sessionStorage.getItem(KEY)) load();
+    </script>
+  </body>
+</html>

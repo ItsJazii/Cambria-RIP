@@ -42,6 +42,9 @@ const initials = (name: string) =>
       <p class="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-[var(--ink-soft)]">
         {description}
       </p>
+      <button type="button" id="report-open" class="glow-button mt-7 rounded-md px-5 py-2.5 text-sm">
+        Report someone
+      </button>
     </div>
   </section>
 
@@ -113,9 +116,104 @@ const initials = (name: string) =>
       )
     }
 
-    <p class="mt-10 text-center text-xs leading-relaxed text-[var(--muted)]">
-      Add a name: copy <code>src/content/shame/_template.md</code> to a new <code>.md</code> file in
-      the same folder, then drop the profile picture in <code>public/shame/</code>.
-    </p>
+    <div class="mt-10 text-center">
+      <button type="button" data-report-open class="source-chip ui-text rounded-md px-4 py-2.5 text-[11px]">
+        Know someone who belongs here? Report them
+      </button>
+    </div>
   </section>
+
+  <dialog
+    id="report-dialog"
+    class="panel m-auto w-[min(92vw,28rem)] p-0 text-[var(--ink)] backdrop:bg-black/70"
+  >
+    <form id="report-form" class="flex flex-col gap-4 p-6" novalidate>
+      <div class="flex items-start justify-between gap-4">
+        <h2 class="display-text text-3xl leading-none">Report someone</h2>
+        <button type="button" data-report-close aria-label="Close" class="text-xl leading-none text-[var(--muted)] hover:text-[var(--ink)]">&times;</button>
+      </div>
+      <p class="text-xs leading-relaxed text-[var(--muted)]">
+        Reports are reviewed by hand before anyone is added to the wall.
+      </p>
+      <label class="flex flex-col gap-1.5">
+        <span class="ui-text text-[11px] text-[var(--ink-soft)]">Name</span>
+        <input name="name" required maxlength="80" autocomplete="off" class="report-input" />
+      </label>
+      <label class="flex flex-col gap-1.5">
+        <span class="ui-text text-[11px] text-[var(--ink-soft)]">What they did</span>
+        <textarea name="offense" required maxlength="2000" rows="4" class="report-input resize-y"></textarea>
+      </label>
+      <label class="flex flex-col gap-1.5">
+        <span class="ui-text text-[11px] text-[var(--ink-soft)]">Their Discord @username</span>
+        <input name="discord" required maxlength="40" placeholder="@username" autocomplete="off" class="report-input" />
+      </label>
+      <input name="website" tabindex="-1" autocomplete="off" aria-hidden="true" class="hidden" />
+      <p id="report-status" class="min-h-[1.25rem] text-xs" role="status"></p>
+      <button type="submit" class="glow-button rounded-md px-5 py-2.5 text-sm">Submit report</button>
+    </form>
+  </dialog>
 </BaseLayout>
+
+<style>
+  .report-input {
+    border: 1px solid var(--line-strong);
+    background: var(--surface-2);
+    color: var(--ink);
+    border-radius: 0.375rem;
+    padding: 0.55rem 0.75rem;
+    font-size: 0.875rem;
+  }
+  .report-input:focus {
+    outline: none;
+    border-color: var(--accent);
+  }
+</style>
+
+<script>
+  const dialog = document.getElementById("report-dialog") as HTMLDialogElement;
+  const form = document.getElementById("report-form") as HTMLFormElement;
+  const status = document.getElementById("report-status") as HTMLParagraphElement;
+  const submit = form.querySelector('button[type="submit"]') as HTMLButtonElement;
+
+  const setStatus = (text: string, ok = false) => {
+    status.textContent = text;
+    status.style.color = ok ? "var(--cat-token)" : "var(--cat-exploit)";
+  };
+
+  document.querySelectorAll("#report-open, [data-report-open]").forEach((btn) =>
+    btn.addEventListener("click", () => {
+      setStatus("");
+      dialog.showModal();
+    }),
+  );
+  dialog.querySelector("[data-report-close]")?.addEventListener("click", () => dialog.close());
+  dialog.addEventListener("click", (e) => {
+    if (e.target === dialog) dialog.close();
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(form)) as Record<string, string>;
+    if (!data.name?.trim() || !data.offense?.trim() || !data.discord?.trim()) {
+      setStatus("Fill in all three fields.");
+      return;
+    }
+    submit.disabled = true;
+    setStatus("Sending...", true);
+    try {
+      const res = await fetch("/api/report", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.error || "Something went wrong");
+      form.reset();
+      setStatus("Report received. Thanks.", true);
+    } catch (err) {
+      setStatus(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      submit.disabled = false;
+    }
+  });
+</script>

@@ -1,0 +1,9 @@
+{
+  "redirects": [
+    { "source": "/airdrop-checker.html", "destination": "https://lobby.cambria.gg/token/", "permanent": false },
+    { "source": "/airdrop-checker", "destination": "https://lobby.cambria.gg/token/", "permanent": false }
+  ],
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://cambria-reports.jazib5876.workers.dev/api/:path*" }
+  ]
+}

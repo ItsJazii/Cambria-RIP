@@ -1,0 +1,13 @@
+{
+  "name": "cambria-reports",
+  "main": "src/index.ts",
+  "compatibility_date": "2026-10-01",
+  "workers_dev": true,
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "cambria-reports",
+      "database_id": "f7d3b92d-7707-458b-87f0-35a562be7e8a"
+    }
+  ]
+}
