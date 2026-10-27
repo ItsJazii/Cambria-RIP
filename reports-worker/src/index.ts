@@ -109,6 +109,8 @@ export default {
   async fetch(req: Request, env: Env): Promise<Response> {
     const { pathname } = new URL(req.url);
 
+    if (pathname === "/api/votes" && req.method === "GET") return listVotes(req, env);
+    if (pathname === "/api/vote" && req.method === "POST") return castVote(req, env);
     if (pathname === "/api/report" && req.method === "POST") return createReport(req, env);
 
     if (pathname === "/api/reports" || pathname.startsWith("/api/reports/")) {
