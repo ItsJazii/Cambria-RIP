@@ -14,6 +14,8 @@ sources:
     url: "https://dexscreener.com/base/0x8e859b6cf564c4ac2b848693c85c496e81dbf6c8"
   - label: "MEXC chart"
     url: "https://www.mexc.com/exchange/RSGP_USDT"
+  - label: "EGamers"
+    url: "https://egamers.io/cambrias-rsgp-presale-26-wallets-hold-51-25-of-tokens-all-fully-unlocked-at-thursdays-tge/"
 ---
 
 "Cambria (RSGP) is Live!" landed at 15:00 UTC, followed by "Also traded on @aeroxyz @fomo @MEXC".
