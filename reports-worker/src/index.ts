@@ -1,6 +1,7 @@
 interface Env {
   DB: D1Database;
   ADMIN_PASSWORD: string;
+  WORKER_PROXY_SECRET?: string;
 }
 
 const LIMITS = { name: 80, offense: 2000, discord: 40 };
@@ -12,8 +13,10 @@ const json = (data: unknown, status = 200) =>
     headers: { "content-type": "application/json", "cache-control": "no-store" },
   });
 
+const digest = (text: string) => crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+
 async function sha256(text: string) {
-  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  const buf = await digest(text);
   return [...new Uint8Array(buf)].map((b) => b.toString(16).padStart(2, "0")).join("");
 }
 
@@ -24,16 +27,22 @@ async function isAdmin(req: Request, env: Env) {
   return a === b;
 }
 
-// Requests arrive via the Vercel rewrite, so the visitor IP is the first x-forwarded-for hop.
-const clientIp = (req: Request) =>
-  req.headers.get("x-forwarded-for")?.split(",")[0].trim() || req.headers.get("cf-connecting-ip") || "unknown";
+async function clientIp(req: Request, env: Env) {
+  const forwardedIp = req.headers.get("x-forwarded-for")?.split(",")[0].trim();
+  const given = req.headers.get("x-worker-proxy-secret");
+  if (forwardedIp && given && env.WORKER_PROXY_SECRET) {
+    const [a, b] = await Promise.all([digest(given), digest(env.WORKER_PROXY_SECRET)]);
+    if (crypto.subtle.timingSafeEqual(a, b)) return forwardedIp;
+  }
+  return req.headers.get("cf-connecting-ip") || "unknown";
+}
 
-const clientHash = (req: Request) => sha256(`cambria:${clientIp(req)}`);
+const clientHash = async (req: Request, env: Env) => sha256(`cambria:${await clientIp(req, env)}`);
 
 const SLUG = /^[a-z0-9-]{1,60}$/;
 
 async function listVotes(req: Request, env: Env) {
-  const ipHash = await clientHash(req);
+  const ipHash = await clientHash(req, env);
   const [totals, mine] = await Promise.all([
     env.DB.prepare("SELECT slug, vote, COUNT(*) AS n FROM votes GROUP BY slug, vote").all<{ slug: string; vote: string; n: number }>(),
     env.DB.prepare("SELECT slug, vote FROM votes WHERE ip_hash = ?").bind(ipHash).all<{ slug: string; vote: string }>(),
@@ -57,7 +66,7 @@ async function castVote(req: Request, env: Env) {
   const vote = body.vote === null ? null : String(body.vote ?? "");
   if (!SLUG.test(slug)) return json({ error: "Invalid profile" }, 400);
   if (vote !== null && vote !== "keep" && vote !== "remove") return json({ error: "Invalid vote" }, 400);
-  const ipHash = await clientHash(req);
+  const ipHash = await clientHash(req, env);
   if (vote === null) {
     await env.DB.prepare("DELETE FROM votes WHERE slug = ? AND ip_hash = ?").bind(slug, ipHash).run();
   } else {
@@ -90,7 +99,7 @@ async function createReport(req: Request, env: Env) {
   }
   if (!/^[a-z0-9._]{2,32}$/i.test(discord)) return json({ error: "Enter a valid Discord username" }, 400);
 
-  const ip = clientIp(req);
+  const ip = await clientIp(req, env);
   const ipHash = await sha256(`cambria-reports:${ip}`);
   const recent = await env.DB.prepare(
     "SELECT COUNT(*) AS n FROM reports WHERE ip_hash = ? AND created_at > datetime('now', '-1 hour')",
